@@ -2,6 +2,7 @@ import 'package:TennisApp/HomePageStuff/View.dart';
 import 'package:TennisApp/SideBarStuff/sideBar/sideBar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'categories_row.dart';
 import 'pieChartViwe.dart';
@@ -27,7 +28,17 @@ List<int> turnAroundlist(List<int> list) {
   return nList;
 }
 
-Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function setState) {
+String activePlayerFirstName;
+String activePlayerlastName;
+List<String> activePlayerFirstNameLetters;
+List<String> activePlayerlastNameLetters;
+String activePlayerFirstLetter;
+String activePlayerlastLetter;
+
+
+
+// ignore: non_constant_identifier_names
+Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function setState, String initials) {
   final height = MediaQuery.of(context).size.height;
   return Column(
     children: [
@@ -169,11 +180,15 @@ Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function set
             ],
           ),
         ),
-        Padding(padding: EdgeInsets.fromLTRB(32, 14, 0, 0), child: Row(
+        Padding(padding: EdgeInsets.fromLTRB(225, 17, 0, 0), child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("George", style: TextStyle(fontSize: 23, fontWeight: FontWeight.w700, color: Colors.grey),),
-           
+              CircleAvatar(
+                backgroundColor: Color(0xFF089BF7),
+                          child: Text("", style: TextStyle(fontWeight: FontWeight.bold),),
+                          radius: 20,
+                        ),
+                      
             ],
           ),),
         

@@ -50,6 +50,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
     String email = preferences.getString("email");
     String firstName = preferences.getString("firstName");
     String uid = preferences.getString("accountRandomUID");
+    setActivePlayer(firstName, lastName);
     print(email);
 
     final databaseReference = FirebaseDatabase.instance.reference();
@@ -111,6 +112,13 @@ for(var i = 0; i < listLength; i++){
     print("object");
   }
 
+ @override
+
+ void setActivePlayer(String firstName, String lastName) async {
+SharedPreferences preferences = await SharedPreferences.getInstance();
+preferences.setString("activePlayerFirstName", firstName);
+preferences.setString("activePlayerLastName", lastName);
+}
 
   @override
   void initState() {

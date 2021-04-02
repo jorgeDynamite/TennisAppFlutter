@@ -4,6 +4,7 @@ import 'package:TennisApp/SideBarStuff/sideBar/sideBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'FirstPageChartWindows/UnforcedErrors.dart';
 import 'FirstPageChartWindows/categories_row.dart';
@@ -17,12 +18,33 @@ class HomePageView extends StatefulWidget {
 
 class _HomePageViewState extends State<HomePageView> {
   bool y = false;
+  String activePlayerFirstName;
+String activePlayerlastName;
+List<String> activePlayerFirstNameLetters;
+List<String> activePlayerlastNameLetters;
+String activePlayerFirstLetter;
+String activePlayerlastLetter;
+String initials;
   @override
   void state() {
     setState(() {
       y = true;
     });
   }
+  
+  @override
+void getActivePlayerData() async {
+SharedPreferences preferences = await SharedPreferences.getInstance();
+activePlayerFirstName = preferences.getString("activePlayerFirstName");
+activePlayerlastName = preferences.getString("activePlayerLastName");
+activePlayerlastNameLetters = preferences.getString("activePlayerLastName").split("");
+activePlayerlastLetter = activePlayerlastNameLetters[0];
+activePlayerFirstNameLetters = preferences.getString("activePlayerLastName").split("");
+activePlayerFirstLetter = activePlayerlastNameLetters[0];
+initials = activePlayerFirstLetter + activePlayerlastLetter;
+
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,12 +60,13 @@ class _HomePageViewState extends State<HomePageView> {
                 scrollDirection: Axis.horizontal,
                 children: [
                   UnforcedErrorWindowFunction(
-                      context, widget.opponentsAndYourPoints, state),
+
+                      context, widget.opponentsAndYourPoints, state, initials),
                   SizedBox(
                     width: 20,
                   ),
                   UnforcedErrorWindowFunction(
-                      context, widget.opponentsAndYourPoints, state),
+                      context, widget.opponentsAndYourPoints, state, initials),
                   SizedBox(
                     width: 20,
                   ),

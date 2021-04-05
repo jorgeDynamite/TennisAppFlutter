@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:TennisApp/HomePageStuff/FirstPageChartWindows/pieChartViwe.dart';
 import 'package:TennisApp/SideBarStuff/sideBar/sideBar.dart';
 
@@ -24,7 +26,11 @@ List<String> activePlayerFirstNameLetters;
 List<String> activePlayerlastNameLetters;
 String activePlayerFirstLetter;
 String activePlayerlastLetter;
-String initials;
+String initials = "GT";
+String playerSelected = "";
+ Timer _timer;
+ double paddingSelectedPlayer = 235;
+  
   @override
   void state() {
     setState(() {
@@ -32,24 +38,56 @@ String initials;
     });
   }
   
-  @override
 void getActivePlayerData() async {
 SharedPreferences preferences = await SharedPreferences.getInstance();
+this.setState(() {
+ 
 activePlayerFirstName = preferences.getString("activePlayerFirstName");
 activePlayerlastName = preferences.getString("activePlayerLastName");
 activePlayerlastNameLetters = preferences.getString("activePlayerLastName").split("");
 activePlayerlastLetter = activePlayerlastNameLetters[0];
-activePlayerFirstNameLetters = preferences.getString("activePlayerLastName").split("");
-activePlayerFirstLetter = activePlayerlastNameLetters[0];
+print(activePlayerlastLetter);
+activePlayerFirstNameLetters = preferences.getString("activePlayerFirstName").split("");
+
+activePlayerFirstLetter = activePlayerFirstNameLetters[0];
+print(activePlayerFirstLetter);
 initials = activePlayerFirstLetter + activePlayerlastLetter;
 
+});
 }
+void selectedPlayerShow() {
+  this.setState(() {
+        
+playerSelected = "Selected Player - ";
+      paddingSelectedPlayer = 90;
+        
+        });
+  
+_timer = new Timer(const Duration(milliseconds: 15000), () {
+
+  this.setState(() {
+        playerSelected = "";
+        paddingSelectedPlayer = 235;
+        });
+ });
+ 
+}
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getActivePlayerData();
+    selectedPlayerShow();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.black,
-        body: Stack( children: [Column(children: [
+        body: Stack( children: [
+            
+          Column(children: [
           SizedBox(height: 20),
           
           Container(
@@ -61,12 +99,12 @@ initials = activePlayerFirstLetter + activePlayerlastLetter;
                 children: [
                   UnforcedErrorWindowFunction(
 
-                      context, widget.opponentsAndYourPoints, state, initials),
+                      context, widget.opponentsAndYourPoints, state, initials, playerSelected, paddingSelectedPlayer),
                   SizedBox(
                     width: 20,
                   ),
                   UnforcedErrorWindowFunction(
-                      context, widget.opponentsAndYourPoints, state, initials),
+                      context, widget.opponentsAndYourPoints, state, initials, playerSelected, paddingSelectedPlayer),
                   SizedBox(
                     width: 20,
                   ),
@@ -495,11 +533,11 @@ initials = activePlayerFirstLetter + activePlayerlastLetter;
                     ),
                   ],
                 ),
-              ],
-            )
-          ]),
+           ]), ],
+            ),
+         
         ]),
-        SideBar(true),
+         SideBar(y, getActivePlayerData, selectedPlayerShow),
         ]));
   }
 }

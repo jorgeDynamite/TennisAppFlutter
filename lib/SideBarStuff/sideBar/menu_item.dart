@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../Players.dart';
+
 class MenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -40,13 +42,19 @@ class MenuItemPlayers extends StatelessWidget {
   final Function onTap;
   final Color color;
   final Color iconColor;
-
-  const MenuItemPlayers({Key key, this.icon, this.title, this.onTap, this.color, this.iconColor}) : super(key: key);
+  final List<Player> players;
+  final List<Widget> playersWidgets;
+  final int index;
+  final Widget selected;
+  
+  const MenuItemPlayers({Key key, this.icon, this.title, this.onTap, this.color, this.iconColor, this.selected, this.players, this.index, this.playersWidgets}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      
+      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -63,6 +71,8 @@ class MenuItemPlayers extends StatelessWidget {
               title,
               style: TextStyle(fontWeight: FontWeight.w300, fontSize: 22, color: color),
             )
+            , 
+           
           ],
         ),
       ),

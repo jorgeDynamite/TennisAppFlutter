@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'categories_row.dart';
 import 'pieChartViwe.dart';
 
+
+
 List<int> turnAroundlist(List<int> list) {
   int x = 0;
   List<int> nList = [0, 0, 0];
@@ -37,8 +39,9 @@ String activePlayerlastLetter;
 
 
 
+
 // ignore: non_constant_identifier_names
-Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function setState, String initials) {
+Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function setState, String initials, String selectedPlayer, double paddingSelectedPlayer) {
   final height = MediaQuery.of(context).size.height;
   return Column(
     children: [
@@ -180,14 +183,16 @@ Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function set
             ],
           ),
         ),
-        Padding(padding: EdgeInsets.fromLTRB(225, 17, 0, 0), child: Row(
+        Padding(padding: EdgeInsets.fromLTRB(paddingSelectedPlayer, 18, 0, 0), child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: [Row(children: [
+              Text(selectedPlayer, style: TextStyle(color: Color(0xFF0ADE7C), fontSize: 17 ),),
               CircleAvatar(
-                backgroundColor: Color(0xFF089BF7),
-                          child: Text("", style: TextStyle(fontWeight: FontWeight.bold),),
-                          radius: 20,
-                        ),
+                backgroundColor: Color(0xFF3E3B3B),
+                          child: Text(initials.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                          radius: 19,
+                        ),],)
+            
                       
             ],
           ),),

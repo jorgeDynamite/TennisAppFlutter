@@ -1,7 +1,6 @@
 import 'dart:async';
 
-
-
+import 'package:TennisApp/HomePageStuff/View.dart';
 import 'package:TennisApp/SideBarStuff/bloc.animation_bloc/navigation.bloc.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -10,23 +9,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 import '../../Players.dart';
 import '../../UnusedStuff/ParentCoachMainPage.dart';
 
 import 'menu_item.dart';
 
-
 class SideBar extends StatefulWidget {
   @override
-  SideBar(this.y);
+  SideBar(this.y, this.sendInitials, this.selectedPlayerFunction);
   bool y;
-  
+  Function sendInitials;
+  Function selectedPlayerFunction;
+
   _SideBarState createState() => _SideBarState();
 }
 
-class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<SideBar> {
-
+class _SideBarState extends State<SideBar>
+    with SingleTickerProviderStateMixin<SideBar> {
   bool loggedIN = true;
   bool playerdataDetected;
   String lastName;
@@ -39,8 +38,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
   List<Player> players = [];
   List<Widget> playersWidgets = [];
   Color color;
+  dynamic widgetContext;
   Color iconColor;
   final _animationDuration = const Duration(milliseconds: 500);
+
+
 
   Future _getIfUserDetails(context) async {
     print("run intisState");
@@ -50,21 +52,27 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
     String email = preferences.getString("email");
     String firstName = preferences.getString("firstName");
     String uid = preferences.getString("accountRandomUID");
-    setActivePlayer(firstName, lastName);
+    int activePlayerIndex = preferences.getInt("activePlayerIndex");
+    String selected = "";
+    List<String> namesOfPlayers;
+   
     print(email);
 
     final databaseReference = FirebaseDatabase.instance.reference();
-  
-  DataSnapshot dataSnapshot = await databaseReference.child("CP_Accounts/" + firstName + lastName + "-" +  uid + "/").once();
+
+    DataSnapshot dataSnapshot = await databaseReference
+        .child("CP_Accounts/" + firstName + lastName + "-" + uid + "/")
+        .once();
     if (dataSnapshot.value != null) {
-    dataSnapshot.value.forEach((key, value) {
-     String firstNamePlayer = value["lastName"];
-    String lastNamePlayer = value["firstName"];
-     String emailPlayer = value["email"];
-     String passwordPlayer = value["password"];
-     players.add(Player(firstNamePlayer, lastNamePlayer, emailPlayer, passwordPlayer));
-     print("adding all the players ");
-     print(players.length);
+      dataSnapshot.value.forEach((key, value) {
+        String firstNamePlayer = value["lastName"];
+        String lastNamePlayer = value["firstName"];
+        String emailPlayer = value["email"];
+        String passwordPlayer = value["password"];
+        players.add(Player(
+            firstNamePlayer, lastNamePlayer, emailPlayer, passwordPlayer));
+        print("adding all the players ");
+        print(players.length);
       });
       playerdataDetected = true;
     } else {
@@ -73,63 +81,114 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
     }
     int listLength = players.length;
     this.setState(() {
-      if(this.playerdataDetected) {
-for(var i = 0; i < listLength; i++){
-  if(i == 0) {
-    color = Color(0xFF0ADE7C);
-    iconColor = color;
-  } else {
-    color = Colors.white;
-    iconColor = Colors.cyan;
-  }
-        this.playersWidgets.add(
-           MenuItemPlayers(
-             iconColor: iconColor,
-             color: color,
-             onTap: () {
-                          onIconPressed();
-                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.MyOrdersClickedEvent);
-                        },
-                        icon: Icons.person,
-                        title: players[i].lastName + " " + players[i].firstName,
-                      )
-         
-   
-   
-                     );
+      if (this.playerdataDetected) {
+        for (var i = 0; i < listLength; i++) {
+          if(activePlayerIndex != null) {
+        if(i == activePlayerIndex) {
+color = Color(0xFF0ADE7C);
+            iconColor = color;
+             selected = " -";
+          } else {
+            color = Colors.white;
+            iconColor = Colors.cyan;
+             selected = "";
+          }
+          } else {
+
+            if (i == 0) {
+            color = Color(0xFF0ADE7C);
+            iconColor = color;
+             selected = " -";
+          } else {
+            color = Colors.white;
+            iconColor = Colors.cyan;
+             selected = "";
+          }
+          }
+          
+          
+       
+          this.playersWidgets.add(MenuItemPlayers(
+                iconColor: iconColor,
+                color: color,
+                players: players,
+                playersWidgets: playersWidgets,
+                index: i,
+                onTap: () { 
+                           print("Pressed");
+                           
+                  _playerOnPressed(i);},
+                icon: Icons.person,
+                title: players[i].lastName + " " + players[i].firstName + selected,
+              ));
+        }
       }
-      
-      }
-      
+
       this.email = email;
       this.lastName = lastName;
       this.firstName = firstName;
+
       this.email = email;
-
-
     });
 
     print("object");
   }
 
- @override
+_playerOnPressed(index,) {
+  setActivePlayer(players[index].lastName, players[index].firstName, index);
+  List<Widget> playerWidgets = [];
+  String selected = "";
+  int listLength = this.players.length; 
+for (var i = 0; i < listLength; i++) {
+          if (i == index) {
+            color = Color(0xFF0ADE7C);
+            iconColor = color;
+            selected = " -";
+          } else {
+            color = Colors.white;
+            iconColor = Colors.cyan;
+            selected = "";
+          }
+         
+          playerWidgets.add(MenuItemPlayers(
+                iconColor: iconColor,
+                color: color,
+                index: i,
+                onTap: () {
+                   _playerOnPressed(i);
+                },
+                icon: Icons.person,
+                title: players[i].lastName + " " + players[i].firstName + selected,
+              ));
+        }
+        this.setState(() {
+          this.playersWidgets = playerWidgets;
+          print("now editet the playersWidgets");
+        });
+      }
 
- void setActivePlayer(String firstName, String lastName) async {
-SharedPreferences preferences = await SharedPreferences.getInstance();
-preferences.setString("activePlayerFirstName", firstName);
-preferences.setString("activePlayerLastName", lastName);
-}
+  void setActivePlayer(String firstName, String lastName, int index) async {
+    print("Starting SetactivePlayerFunction");
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString("activePlayerFirstName", firstName);
+    preferences.setString("activePlayerLastName", lastName);
+    preferences.setInt("activePlayerIndex", index);
+
+    widget.sendInitials();
+  }
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(vsync: this, duration: _animationDuration);
+    _animationController =
+        AnimationController(vsync: this, duration: _animationDuration);
 
     isSidebarOpenedStreamController = PublishSubject<bool>();
     isSidebarOpenedStream = isSidebarOpenedStreamController.stream;
     isSidebarOpenedSink = isSidebarOpenedStreamController.sink;
-    _getIfUserDetails(context); 
-    
+    print("need context");
+    _getIfUserDetails(widgetContext);
+
   }
 
   @override
@@ -143,7 +202,7 @@ preferences.setString("activePlayerLastName", lastName);
   void onIconPressed() {
     final animationStatus = _animationController.status;
     final isAnimationCompleted = animationStatus == AnimationStatus.completed;
-
+    
     if (isAnimationCompleted) {
       isSidebarOpenedSink.add(false);
       _animationController.reverse();
@@ -153,21 +212,22 @@ preferences.setString("activePlayerLastName", lastName);
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if(firstName == null ) {
+    widgetContext = context;
+    print("context defined");
+    if (firstName == null) {
       firstName = "waiting";
     }
-    if(email == null ) {
+    if (email == null) {
       email = "waiting";
     }
     final screenWidth = MediaQuery.of(context).size.width;
-   if (widget.y) {
-onIconPressed();
+   
+    if (widget.y) {
+      onIconPressed();
     }
     return StreamBuilder<bool>(
-      
       initialData: false,
       stream: isSidebarOpenedStream,
       builder: (context, isSideBarOpenedAsync) {
@@ -176,7 +236,7 @@ onIconPressed();
           top: 0,
           bottom: 0,
           left: isSideBarOpenedAsync.data ? 0 : -screenWidth,
-          right: isSideBarOpenedAsync.data ? 0 : screenWidth ,
+          right: isSideBarOpenedAsync.data ? 0 : screenWidth,
           child: Row(
             children: <Widget>[
               Expanded(
@@ -191,7 +251,10 @@ onIconPressed();
                       ListTile(
                         title: Text(
                           firstName,
-                          style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w800),
                         ),
                         subtitle: Text(
                           email,
@@ -215,7 +278,7 @@ onIconPressed();
                         indent: 32,
                         endIndent: 32,
                       ),
-                     Column(children: playersWidgets),
+                      Column(children: playersWidgets),
                       Divider(
                         height: 64,
                         thickness: 0.5,
@@ -228,6 +291,9 @@ onIconPressed();
                         title: "Settings",
                       ),
                       MenuItem(
+                        onTap: () {
+                          onIconPressed();
+                        },
                         icon: Icons.exit_to_app,
                         title: "Logout",
                       ),
@@ -240,6 +306,7 @@ onIconPressed();
                 child: GestureDetector(
                   onTap: () {
                     onIconPressed();
+                   
                   },
                   child: ClipPath(
                     clipper: CustomMenuClipper(),

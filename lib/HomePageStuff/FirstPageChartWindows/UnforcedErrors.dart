@@ -38,11 +38,15 @@ String activePlayerFirstLetter;
 String activePlayerlastLetter;
 
 
+  
 
 
 // ignore: non_constant_identifier_names
-Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function setState, String initials, String selectedPlayer, double paddingSelectedPlayer) {
+Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function setState, String initials, String selectedPlayer, double paddingSelectedPlayer, String  playerFirstName, String playerLastName) {
   final height = MediaQuery.of(context).size.height;
+ if(activePlayerFirstName == null) {
+   activePlayerFirstName = "Hello";
+ }
   return Column(
     children: [
       Stack(children: [
@@ -95,7 +99,8 @@ Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function set
                                         child: Row(
                                           children: <Widget>[
                                             CategoriesRow(
-                                              amount: opponentsAndYourPoints,
+                                              amount: opponentsAndYourPoints, 
+                                              firstName: playerFirstName,
                                             ),
                                             PieChartView(
                                               amount: turnAroundlist(
@@ -105,6 +110,7 @@ Widget UnforcedErrorWindowFunction(context, opponentsAndYourPoints, Function set
                                                               .length -
                                                           1]
                                                   .toInt(),
+                                                  firstName: playerFirstName,
                                             ),
                                           ],
                                         ),

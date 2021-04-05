@@ -272,12 +272,14 @@ for (var i = 0; i < listLength; i++) {
                         ),
                       ),
                       Divider(
-                        height: 64,
+                        height: 40,
                         thickness: 0.5,
                         color: Colors.white.withOpacity(0.3),
                         indent: 32,
                         endIndent: 32,
-                      ),
+                      ), 
+                      Padding(padding: EdgeInsets.fromLTRB(25, 10, 0, 10), child: Row(children: [Text("Select Player ", style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800),)],),),
+                      
                       Column(children: playersWidgets),
                       Divider(
                         height: 64,

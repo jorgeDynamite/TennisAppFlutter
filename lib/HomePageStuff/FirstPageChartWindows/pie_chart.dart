@@ -1,13 +1,15 @@
 import 'dart:math';
 
+import 'package:TennisApp/HomePageStuff/FirstPageChartWindows/UnforcedErrors.dart';
 import 'package:flutter/material.dart';
 
 class PieChart extends CustomPainter {
-  PieChart({@required this.categories, @required this.width, @required this.amount, });
+  PieChart({@required this.categories, @required this.width, @required this.amount, @required this.activePlayerFirstName });
 
   final List<Category> categories;
   final int width;
   final List<int> amount;
+  final String activePlayerFirstName;
   
 
   @override
@@ -75,7 +77,7 @@ List<Category> kCategories() {
  
     final kCategories = [
 
-  Category('You', amount: amounts[0]),
+  Category(activePlayerFirstName, amount: amounts[0]),
   Category("Opponent", amount: amounts[1]),
   
 ];

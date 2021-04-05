@@ -7,9 +7,11 @@ class PieChartView extends StatelessWidget {
     Key key,
     this.pro,
      this.amount,
+     this.firstName
   }) : super(key: key);
 final List<int> amount;
 final int pro;
+final String firstName;
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -32,6 +34,7 @@ final int pro;
                       amount: amount,
                       width: 33,
                       categories: cate(amount).kCategories(),
+                      activePlayerFirstName: firstName,
                     ),
                   ),
                 ),

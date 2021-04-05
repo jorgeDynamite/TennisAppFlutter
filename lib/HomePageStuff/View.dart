@@ -20,7 +20,7 @@ class HomePageView extends StatefulWidget {
 
 class _HomePageViewState extends State<HomePageView> {
   bool y = false;
-  String activePlayerFirstName;
+  String activePlayerFirstName = "";
 String activePlayerlastName;
 List<String> activePlayerFirstNameLetters;
 List<String> activePlayerlastNameLetters;
@@ -99,12 +99,12 @@ _timer = new Timer(const Duration(milliseconds: 15000), () {
                 children: [
                   UnforcedErrorWindowFunction(
 
-                      context, widget.opponentsAndYourPoints, state, initials, playerSelected, paddingSelectedPlayer),
+                      context, widget.opponentsAndYourPoints, state, initials, playerSelected, paddingSelectedPlayer, activePlayerFirstName, activePlayerlastName),
                   SizedBox(
                     width: 20,
                   ),
                   UnforcedErrorWindowFunction(
-                      context, widget.opponentsAndYourPoints, state, initials, playerSelected, paddingSelectedPlayer),
+                      context, widget.opponentsAndYourPoints, state, initials, playerSelected, paddingSelectedPlayer,  activePlayerFirstName, activePlayerlastName),
                   SizedBox(
                     width: 20,
                   ),

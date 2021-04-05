@@ -7,9 +7,12 @@ class CategoriesRow extends StatelessWidget {
   
   const CategoriesRow({
     @required this.amount,
+    @required this.firstName,
+
     Key key,
   }) : super(key: key);
 final List<int> amount;
+final String firstName;
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -20,7 +23,7 @@ final List<int> amount;
          /* for (var category in cate(amount).kCategories()) */
           
           ExpenseCategory(
-                text: "You", index: 2, ),//cate(amount).kCategories().indexOf(category))
+                text: firstName, index: 2, ),//cate(amount).kCategories().indexOf(category))
           ExpenseCategory(
                 text: "Opponent", index: 1)
       

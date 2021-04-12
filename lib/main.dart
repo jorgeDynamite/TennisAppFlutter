@@ -5,6 +5,7 @@ import 'package:TennisApp/LoginPage.dart';
 import 'package:TennisApp/SignUp.dart';
 import 'package:TennisApp/UnusedStuff/Radera_data.dart';
 import 'package:TennisApp/emailVerificationPage.dart';
+import 'package:TennisApp/newMatch/newMatchFirstPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class TennisAppHomePage extends StatefulWidget {
 
 class _TennisAppHomePageState extends State<TennisAppHomePage> {
   bool loggedIN;
-
+/*
   @override
   void initState() {
     // TODO: implement initState
@@ -49,7 +50,7 @@ class _TennisAppHomePageState extends State<TennisAppHomePage> {
     });
     super.initState();
   }
-  
+  */
   Future _getIfUserLogedIn(context) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     bool loggedIn = preferences.getBool("loggedIn") ?? false;
@@ -62,6 +63,6 @@ class _TennisAppHomePageState extends State<TennisAppHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingPage();
+    return NewMatchFirstPage();
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:TennisApp/HomePageStuff/FirstPageChartWindows/pieChartViwe.dart';
 import 'package:TennisApp/SideBarStuff/sideBar/sideBar.dart';
+import 'package:TennisApp/newMatch/newMatchFirstPage.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -228,7 +229,7 @@ _timer = new Timer(const Duration(milliseconds: 15000), () {
                               padding: EdgeInsets.fromLTRB(22, 25, 10, 0),
                               child: Column(
                                 children: [
-                                  Text("View all tracked analytics",
+                                  Text("View " + activePlayerFirstName + "'s" +  " tracked analytics",
                                       style: TextStyle(
                                           color: Color(0xFF9B9191),
                                           fontSize: 11.5,
@@ -302,7 +303,7 @@ _timer = new Timer(const Duration(milliseconds: 15000), () {
                               padding: EdgeInsets.fromLTRB(22, 10, 10, 0),
                               child: Column(
                                 children: [
-                                  Text("Follow your students match live",
+                                  Text("Learn about tennis statistcs",
                                       style: TextStyle(
                                           color: Color(0xFF9B9191),
                                           fontSize: 11.5,
@@ -474,6 +475,10 @@ _timer = new Timer(const Duration(milliseconds: 15000), () {
                               children: [
                                 Padding(
                                   child: IconButton(
+                                    onPressed: () {
+                                      Navigator.push(context,
+                MaterialPageRoute(builder: (_) => NewMatchFirstPage()));
+                                    },
                                     icon: Image.asset(
                                       "Style/Pictures/addButtonGreyReal.png",
                                       height: 22,

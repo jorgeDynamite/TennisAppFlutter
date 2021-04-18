@@ -8,6 +8,32 @@ class NewMatchFirstPage extends StatefulWidget {
 
 class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
   TextEditingController controller;
+  bool textFieldFilled = false;
+
+
+  changeFilledValue(bool theBool){
+    
+    textFieldFilled = theBool;
+  }
+  double errorMessagePadding = 26;
+
+  Widget errorMessageArg;
+
+Widget errorMessageState(widget) {
+  if(widget == null){
+
+return Container();
+
+  } else {
+
+return widget;
+
+  }
+}
+
+Widget errorMessage() {
+return Text("Error: Must fill in all information ", style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),);
+}
   double greenLineWidth = 107;
   @override
   Widget build(BuildContext context) {
@@ -116,8 +142,8 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
                 Padding(
                     padding: EdgeInsets.only(left: 30, right: 30),
                     child: _buildTextField(
-                        controller, Icons.person, "Opponent Name", false))
-              ],
+                        controller, Icons.person, "Opponent Name", false, changeFilledValue)
+                )],
             ),
           ),
           SizedBox(
@@ -126,12 +152,18 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
           MaterialButton(
               onPressed: () {
                 setState(() {
-                 
-                 
-                    Navigator.push(
+                 if(textFieldFilled) {
+ Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => NewMatchSecondPage()));
+                 } else {
+                   errorMessageArg = errorMessage();
+                   errorMessagePadding = 9;
+
+                 }
+                 
+                   
                 });
               },
               child: Container(
@@ -160,8 +192,9 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
                     )
                   ],
                 ),
-              )),
-              SizedBox(height: 356),
+              )),SizedBox(height: errorMessagePadding),
+              errorMessageState(errorMessageArg),
+              SizedBox(height: 330),
               Align(alignment: Alignment.bottomCenter,child: 
               Row(
                 
@@ -282,7 +315,7 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
 }
 
 _buildTextField(TextEditingController controller, IconData icon,
-    String labelText, bool obscure) {
+    String labelText, bool obscure, Function changedValue) {
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
     decoration: BoxDecoration(
@@ -290,6 +323,13 @@ _buildTextField(TextEditingController controller, IconData icon,
         color: Color(0xFF3E3B3B),
         border: Border.all(color: Colors.transparent)),
     child: TextField(
+      onChanged: (text) {
+if(text != "") {
+ changedValue(true);
+} else {
+  changedValue(false);
+}
+      },
       obscureText: obscure,
       controller: controller,
       style: TextStyle(color: Colors.white),

@@ -2,6 +2,8 @@ import 'package:TennisApp/HomePageStuff/View.dart';
 import 'package:TennisApp/newMatch/newMatchFirstPage.dart';
 import 'package:flutter/material.dart';
 
+import 'newMatchLastPage.dart';
+
 class NewMatchSecondPage extends StatefulWidget {
   @override
   _NewMatchSecondPageState createState() => _NewMatchSecondPageState();
@@ -18,7 +20,25 @@ class _NewMatchSecondPageState extends State<NewMatchSecondPage> {
   Color iconColor = Colors.white;
   double paddingMenuBar = 216;
   Widget nextButtonWidgetStateDependent;
+double errorMessagePadding = 0;
 
+Widget errorMessageArg;
+
+Widget errorMessageState(widget) {
+  if(widget == null){
+
+return Container();
+
+  } else {
+
+return widget;
+
+  }
+}
+
+Widget errorMessage() {
+return Text("Error: Must fill in all information ", style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),);
+}
   Widget nextButtonState(widget) {
     if (widget == null) {
       return nextButton();
@@ -34,8 +54,14 @@ class _NewMatchSecondPageState extends State<NewMatchSecondPage> {
             if (greenLineWidth != 321) {
               greenLineWidth = greenLineWidth + 107;
             }
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => NewMatchFirstPage()));
+            if(matchTypeButtonText != "Match Format"){
+Navigator.push(context,
+                MaterialPageRoute(builder: (_) => NewMatchLastPage()));
+            } else {
+              errorMessagePadding = 17;
+              errorMessageArg = errorMessage();
+            }
+            
           });
         },
         child: Container(
@@ -410,6 +436,8 @@ class _NewMatchSecondPageState extends State<NewMatchSecondPage> {
                                 splashColor: null,
                                 onPressed: () {
                                   this.setState(() {
+                                    errorMessageArg = Container();
+                                    errorMessagePadding = 0;
                                     rulesWidget = Container();
 
                                     if (theWidgetIndex == 0) {
@@ -476,8 +504,10 @@ class _NewMatchSecondPageState extends State<NewMatchSecondPage> {
             height: 15,
           ),
           nextButtonState(nextButtonWidgetStateDependent),
-          SizedBox(height: paddingMenuBar),
-          SizedBox(height: 5),
+          SizedBox(height: 5 ),
+          errorMessageState(errorMessageArg ),
+          SizedBox(height: paddingMenuBar - errorMessagePadding),
+          
           Padding(
             padding: EdgeInsets.only(right: 250),
             child: MaterialButton(

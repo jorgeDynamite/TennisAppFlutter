@@ -1,15 +1,29 @@
 import 'package:TennisApp/HomePageStuff/View.dart';
+import 'package:TennisApp/Players.dart';
 import 'package:TennisApp/newMatch/newMatchFirstPage.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewMatchLastPage extends StatefulWidget {
+  NewMatchLastPage(this.matchFormat, this.ad, this.opponentName);
+  final MatchFormat matchFormat;
+  final bool ad;
+  final String opponentName;
   @override
   _NewMatchLastPageState createState() => _NewMatchLastPageState();
 }
 
 class _NewMatchLastPageState extends State<NewMatchLastPage> {
-  TextEditingController controller;
+  TextEditingController controller = TextEditingController();
   double greenLineWidth = 214;
+  final databaseReference = FirebaseDatabase.instance.reference();
+  String coachlastName;
+  String coachfirstName;
+  String coachemail;
+  String coachuid;    
+  
+
   Widget iconPressed;
   bool iconPressedBool = false;
   int theWidgetIndex = 0;
@@ -24,9 +38,13 @@ class _NewMatchLastPageState extends State<NewMatchLastPage> {
   bool surfacenotClickOnTwoButtonsTwice = false;
     bool matchTypenotClickOnTwoButtonsTwice = false;
     bool textFieldChangedBool = false;
+    String tournamentName;
+  Tournament newTournament;
+  String surface; 
+  Matches match;
+ List<int> trackedStats= [1,1,1,0,0,0,1,0,0,0,0,0,0,0,0];
   
-    
-  List<String> tournaments = ["Södertälje", "Audi cup", "miami open"];
+  List<String> activeTournaments = [];
   List<bool> firststatButtonsOnPressedBool = [
     true,
     true,
@@ -52,11 +70,76 @@ class _NewMatchLastPageState extends State<NewMatchLastPage> {
   ];
 List<bool> changeablestatButtonsOnPressedBool = [true, false ];
 
+Future getActiveTournaments() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    this.coachlastName = preferences.getString("lastName");
+    
+    this.coachfirstName = preferences.getString("firstName");
+    this.coachuid = preferences.getString("accountRandomUID");
+    String url = ("CP_Accounts/" + coachfirstName + coachlastName + "-" + coachuid + "/" + "playerTournaments" + "/");
+
+    databaseReference.child(url).push();
+    DataSnapshot dataSnapshot = await databaseReference.child(url).once();
+
+    if (dataSnapshot.value != null) {
+      dataSnapshot.value.forEach((key, value) {
+    activeTournaments.add(key.toString());
+        print(key);
+      });
+    } else {
+      print("no tournament data was detected");
+      
+    }
+    print("activeTournaments:" + activeTournaments.length.toString());
+}
 
 @override
-    void dispose() {
-        controller.dispose(); //prevents memory leak
-    }
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getActiveTournaments();
+  }
+
+
+
+Tournament matchDataPack() {
+
+if(iconPressed != null){
+  tournamentName = controller.text;
+
+} 
+else {
+  tournamentName = matchTypeButtonText;
+  
+}
+
+if(surfaceTypeButtonText == "Hard Court"){
+surface = "Hard Court";
+}
+if(surfaceTypeButtonText == "Clay"){
+surface = "Hard Court";
+}
+if(surfaceTypeButtonText == "Grass"){
+surface = "Grass";
+}
+if(surfaceTypeButtonText == "Carpet"){
+surface = "Carpet";
+}
+
+match = Matches( winners: trackedStats[0], doubleFaults: trackedStats[1], unforcedErrors: trackedStats[2], firstServeProcentage: trackedStats[3], secondServeProcentage: trackedStats[4], forcedErrors: trackedStats[5], aces: trackedStats[6], voleyErrors: trackedStats[7], voleyWinner: trackedStats[8], returnWinner: trackedStats[9], returnErrors: trackedStats[0]
+,rules: Rules(ad: widget.ad, matchFormatVariable: widget.matchFormat), surface: surface, opponent: widget.opponentName); 
+
+if(tournamentName == null){
+  //Ad match in existing tournament
+  
+} else {
+newTournament = Tournament(matches: [match], surface: [surface], tournamentName: tournamentName);
+
+}
+
+
+}
+
 // Current Tournaments 
 
 Widget currentTournamentarg;
@@ -83,6 +166,8 @@ Widget currentTournament(){
                                 
                                   this.setState(() {
                                     if (theWidgetIndex == 0) {
+                                      if(activeTournaments.length != 0){
+
                                       if (!matchTypenotClickOnTwoButtonsTwice) {
                                       statCheatCurrentWidget = Container();
                                       nextButtonWidgetStateDependent =
@@ -93,6 +178,11 @@ Widget currentTournament(){
                                       theWidgetIndex = 1;
                                       paddingMenuBar = 0;
                                        surfacenotClickOnTwoButtonsTwice = true;
+                                       }
+                                       } else {
+                                         errorMessageArg = errorMessageNoActiveTournamnets();
+                                         errorMessagePadding = 37;
+                                        
                                        }
                                     } else {
                                       if (!matchTypenotClickOnTwoButtonsTwice) {
@@ -200,6 +290,104 @@ if(text != "") {
 }
 // Statcheat buttons
 
+void noteTheStatsTrackedFunc(String stat){
+if(stat == "Winners"){
+if(trackedStats[0] == 0){
+trackedStats[0] = 1;
+} else {
+  trackedStats[0] = 0;
+}
+
+}
+if(stat == "Double Faults"){
+if(trackedStats[1] == 0){
+trackedStats[1] = 1;
+} else {
+  trackedStats[1] = 0;
+}
+
+}
+
+if(stat == "Unforced   Errors"){
+if(trackedStats[2] == 0){
+trackedStats[2] = 1;
+} else {
+  trackedStats[2] = 0;
+}
+
+}
+if(stat == "First Serves"){
+if(trackedStats[3] == 0){
+trackedStats[3] = 1;
+} else {
+  trackedStats[3] = 0;
+}
+
+}
+if(stat == "Second Serves"){
+if(trackedStats[4] == 0){
+trackedStats[4] = 1;
+} else {
+  trackedStats[4] = 0;
+}
+
+}
+if(stat == "Forced Errors"){
+if(trackedStats[5] == 0){
+trackedStats[5] = 1;
+} else {
+  trackedStats[5] = 0;
+}
+
+}
+if(stat == "Aces"){
+if(trackedStats[6] == 0){
+trackedStats[6] = 1;
+} else {
+  trackedStats[6] = 0;
+}
+
+}
+if(stat == "Volley Errors"){
+if(trackedStats[7] == 0){
+trackedStats[7] = 1;
+} else {
+  trackedStats[7] = 0;
+}
+
+}
+if(stat == "Volley Winners"){
+if(trackedStats[8] == 0){
+trackedStats[8] = 1;
+} else {
+  trackedStats[8] = 0;
+}
+
+}
+if(stat == "Return Winners"){
+if(trackedStats[9] == 0){
+trackedStats[9] = 1;
+} else {
+  trackedStats[9] = 0;
+}
+
+}
+
+if(stat == "Return Errors"){
+if(trackedStats[10] == 0){
+trackedStats[10] = 1;
+} else {
+  trackedStats[10] = 0;
+}
+
+}
+
+print(trackedStats);
+
+}
+
+
+
   Widget statCheatCurrentWidget;
 
   Widget statCheatWidgetState(widget) {
@@ -260,7 +448,7 @@ if(borderColor == null ) {
                
                 
               }
-           
+           noteTheStatsTrackedFunc(stat);
           },
           child: Padding(
             padding: EdgeInsets.only(
@@ -346,7 +534,7 @@ if(borderColor == null ) {
                 children: [
                   statCheatButtons("Volley Errors", 7, 0, 2, 6, 0,
                       12), // last 4 is textPadding args and fontSize args
-                  statCheatButtons("Volley winners", 8, 0, 0, 2, 0, 12), // tblr
+                  statCheatButtons("Volley Winners", 8, 0, 0, 0, 0, 12), // tblr
                   statCheatButtons("Return Winners", 9, 0, 0, 0, 0, 12),
                   statCheatButtons("Return Errors", 10, 0, 2, 4, 0, 12),
                 ],
@@ -372,14 +560,14 @@ if(borderColor == null ) {
 
   Widget witchTournamentWidget() {
     List<Widget> torunamentsWidget = [];
-    for (var i = 0; i < tournaments.length; i++) {
-      if (i == tournaments.length - 1) {
+    for (var i = 0; i < activeTournaments.length; i++) {
+      if (i == activeTournaments.length - 1) {
         torunamentsWidget.add(Column(children: [
-          SurfaceButton(tournaments[i], 2, 1),
+          SurfaceButton(activeTournaments[i], 2, 1),
         ]));
       } else {
         torunamentsWidget.add(Column(children: [
-          SurfaceButton(tournaments[i], 2, 1),
+          SurfaceButton(activeTournaments[i], 2, 1),
           Divider(
             thickness: 0.5,
             color: Colors.white,
@@ -414,14 +602,18 @@ bool controllerHasText(bool theBool){
     }
     return returnBool;
 }
-void checkForErrorFunction(){
+
+Future checkForErrorFunction() async {
+      String url = ("CP_Accounts/" + coachfirstName + coachlastName + "-" + coachuid + "/" + "playerTournaments" + "/");
+
   if(iconPressedBool){
 if(textFieldChangedBool){
  
                 if(surfaceTypeButtonText != "Surface") {
                   
-                  Navigator.push(context,
-                MaterialPageRoute(builder: (_) => NewMatchFirstPage()));
+                matchDataPack();
+             
+            
                 } else {
                   setState(() {
                     errorMessageArg = errorMessage();
@@ -438,7 +630,8 @@ if(textFieldChangedBool){
   } else {
     if(matchTypeButtonText != "Tournament") {
        if(surfaceTypeButtonText != "Surface") {
-                  
+                   matchDataPack();
+            
                   Navigator.push(context,
                 MaterialPageRoute(builder: (_) => NewMatchFirstPage()));
                 } else {
@@ -618,6 +811,9 @@ return widget;
 
 Widget errorMessage() {
 return Text("Error: Must fill in all information ", style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),);
+}
+Widget errorMessageNoActiveTournamnets() {
+return Text("Error: No on going tournamnets ", style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),);
 }
   @override
   Widget build(BuildContext context) {
@@ -874,12 +1070,11 @@ currentTournamentState(currentTournamentarg),
           SizedBox(height: 10),
           Padding(
             padding: EdgeInsets.only(right: errorMessagePadding),
-            child:Row(children: [ MaterialButton(
+            child: Row(children: [ MaterialButton(
               onPressed: () {
                 greenLineWidth = greenLineWidth - 107;
 
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => NewMatchFirstPage()));
+                Navigator.pop(context);
               },
               child: Container(
                 height: 50,

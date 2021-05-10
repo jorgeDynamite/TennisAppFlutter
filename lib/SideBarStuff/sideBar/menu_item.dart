@@ -9,6 +9,7 @@ class MenuItem extends StatelessWidget {
 
   const MenuItem({Key key, this.icon, this.title, this.onTap}) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -25,6 +26,7 @@ class MenuItem extends StatelessWidget {
             SizedBox(
               width: 20,
             ),
+            
             Text(
               title,
               style: TextStyle(fontWeight: FontWeight.w300, fontSize: 26, color: Colors.white),
@@ -67,6 +69,7 @@ class MenuItemPlayers extends StatelessWidget {
             SizedBox(
               width: 20,
             ),
+           
             Text(
               title,
               style: TextStyle(fontWeight: FontWeight.w300, fontSize: 22, color: color),

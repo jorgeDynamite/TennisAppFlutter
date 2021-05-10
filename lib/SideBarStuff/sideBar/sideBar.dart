@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:TennisApp/HomePageStuff/View.dart';
+import 'package:TennisApp/LoginPage.dart';
 import 'package:TennisApp/SideBarStuff/bloc.animation_bloc/navigation.bloc.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -16,10 +17,11 @@ import 'menu_item.dart';
 
 class SideBar extends StatefulWidget {
   @override
-  SideBar(this.y, this.sendInitials, this.selectedPlayerFunction);
+  SideBar(this.y, this.sendInitials, this.selectedPlayerFunction, this.ifCoach);
   bool y;
   Function sendInitials;
   Function selectedPlayerFunction;
+  bool ifCoach;
 
   _SideBarState createState() => _SideBarState();
 }
@@ -42,39 +44,106 @@ class _SideBarState extends State<SideBar>
   Color iconColor;
   final _animationDuration = const Duration(milliseconds: 500);
 
+String nameToLongFunc(String title, int maxAmountLetters){
+ 
+List<String> splitTitle = title.split("");
+print(splitTitle);
+print(splitTitle.length);
+String newTitle = "";
+if(splitTitle.length > maxAmountLetters){
 
 
+for(var i = 0; i < maxAmountLetters; i++){
+newTitle = newTitle + splitTitle[i];
+print(newTitle);
+}
+
+return newTitle;
+
+} else {
+  return title;
+}
+
+}
+
+Widget selectedPlayersHeadLine() {
+  if(widget.ifCoach){
+return Column(children: [Padding(
+                        padding: EdgeInsets.fromLTRB(25, 10, 0, 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Select Player ",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w800),
+                            )
+                          ],
+                        ),
+                      ),
+                      Column(children: playersWidgets),
+                      Divider(
+                        height: 64,
+                        thickness: 0.5,
+                        color: Colors.white.withOpacity(0.3),
+                        indent: 32,
+                        endIndent: 32,
+                      ),
+                      ],)
+                      ;
+  } else {
+    return Container();
+  }
+}
+ 
   Future _getIfUserDetails(context) async {
     print("run intisState");
     SharedPreferences preferences = await SharedPreferences.getInstance();
     bool loggedIn = preferences.getBool("loggedIn") ?? false;
-    String lastName = preferences.getString("lastName");
-    String email = preferences.getString("email");
-    String firstName = preferences.getString("firstName");
+    this.lastName = preferences.getString("lastName");
+    this.email = preferences.getString("email");
+    this.firstName = preferences.getString("firstName");
+    if(widget.ifCoach){
     String uid = preferences.getString("accountRandomUID");
     int activePlayerIndex = preferences.getInt("activePlayerIndex");
     String selected = "";
     List<String> namesOfPlayers;
-   
+
     print(email);
 
     final databaseReference = FirebaseDatabase.instance.reference();
-
+    
     DataSnapshot dataSnapshot = await databaseReference
         .child("CP_Accounts/" + firstName + lastName + "-" + uid + "/")
-        .once();
+        .once();             
+    print("Data reference thing = " +
+        "CP_Accounts/" +
+        firstName +
+        lastName +
+        "-" +
+        uid +
+        "/");
     if (dataSnapshot.value != null) {
       dataSnapshot.value.forEach((key, value) {
-        String firstNamePlayer = value["lastName"];
-        String lastNamePlayer = value["firstName"];
-        String emailPlayer = value["email"];
-        String passwordPlayer = value["password"];
-        players.add(Player(
-            firstNamePlayer, lastNamePlayer, emailPlayer, passwordPlayer));
-        print("adding all the players ");
-        print(players.length);
+        if (value["mainController"] == null) {
+          value.forEach((key, value) {
+            print(key);
+            String firstNamePlayer = value["lastName"];
+            String lastNamePlayer = value["firstName"];
+            String emailPlayer = value["email"];
+            String passwordPlayer = value["password"];
+            players.add(Player(
+                firstName: firstNamePlayer,
+                lastName: lastNamePlayer,
+                email: emailPlayer,
+                password: passwordPlayer));
+            print("adding all the players ");
+            print(players.length.toString());
+          });
+        }
+        playerdataDetected = true;
       });
-      playerdataDetected = true;
     } else {
       print("no player data was detected");
       playerdataDetected = false;
@@ -83,43 +152,44 @@ class _SideBarState extends State<SideBar>
     this.setState(() {
       if (this.playerdataDetected) {
         for (var i = 0; i < listLength; i++) {
-          if(activePlayerIndex != null) {
-        if(i == activePlayerIndex) {
-color = Color(0xFF0ADE7C);
-            iconColor = color;
-             selected = " -";
+          if (activePlayerIndex != null) {
+            if (i == activePlayerIndex) {
+              color = Color(0xFF0ADE7C);
+              iconColor = color;
+              selected = " -";
+            } else {
+              color = Colors.white;
+              iconColor = Colors.cyan;
+              selected = "";
+            }
           } else {
-            color = Colors.white;
-            iconColor = Colors.cyan;
-             selected = "";
-          }
-          } else {
-
             if (i == 0) {
-            color = Color(0xFF0ADE7C);
-            iconColor = color;
-             selected = " -";
-          } else {
-            color = Colors.white;
-            iconColor = Colors.cyan;
-             selected = "";
+              setActivePlayer(players[i].lastName, players[i].firstName, i);
+              color = Color(0xFF0ADE7C);
+              iconColor = color;
+              selected = " -";
+            } else {
+              color = Colors.white;
+              iconColor = Colors.cyan;
+              selected = "";
+            }
           }
-          }
+           String title = players[i].lastName + " " + players[i].firstName + selected;
           
-          
-       
           this.playersWidgets.add(MenuItemPlayers(
                 iconColor: iconColor,
                 color: color,
                 players: players,
                 playersWidgets: playersWidgets,
                 index: i,
-                onTap: () { 
-                           print("Pressed");
-                           
-                  _playerOnPressed(i);},
+                onTap: () {
+                  print("Pressed");
+
+                  _playerOnPressed(i);
+                },
                 icon: Icons.person,
-                title: players[i].lastName + " " + players[i].firstName + selected,
+                title:
+                    nameToLongFunc(title, 18),
               ));
         }
       }
@@ -133,48 +203,53 @@ color = Color(0xFF0ADE7C);
 
     print("object");
   }
+  }
 
-_playerOnPressed(index,) {
-  setActivePlayer(players[index].lastName, players[index].firstName, index);
-  List<Widget> playerWidgets = [];
-  String selected = "";
-  int listLength = this.players.length; 
-for (var i = 0; i < listLength; i++) {
-          if (i == index) {
-            color = Color(0xFF0ADE7C);
-            iconColor = color;
-            selected = " -";
-          } else {
-            color = Colors.white;
-            iconColor = Colors.cyan;
-            selected = "";
-          }
-         
-          playerWidgets.add(MenuItemPlayers(
-                iconColor: iconColor,
-                color: color,
-                index: i,
-                onTap: () {
-                   _playerOnPressed(i);
-                },
-                icon: Icons.person,
-                title: players[i].lastName + " " + players[i].firstName + selected,
-              ));
-        }
-        this.setState(() {
-          this.playersWidgets = playerWidgets;
-          print("now editet the playersWidgets");
-        });
+  _playerOnPressed(
+    index,
+  ) {
+    setActivePlayer(players[index].lastName, players[index].firstName, index);
+    List<Widget> playerWidgets = [];
+    String selected = "";
+
+    int listLength = this.players.length;
+    for (var i = 0; i < listLength; i++) {
+      if (i == index) {
+        color = Color(0xFF0ADE7C);
+        iconColor = color;
+        selected = " -";
+      } else {
+        color = Colors.white;
+        iconColor = Colors.cyan;
+        selected = "";
       }
 
+      playerWidgets.add(MenuItemPlayers(
+        iconColor: iconColor,
+        color: color,
+        index: i,
+        onTap: () {
+          _playerOnPressed(i);
+        },
+        icon: Icons.person,
+        title: nameToLongFunc(players[i].lastName + " " + players[i].firstName + selected, 18),
+      ));
+    }
+    this.setState(() {
+      this.playersWidgets = playerWidgets;
+      print("now editet the playersWidgets");
+    });
+  }
+
   void setActivePlayer(String firstName, String lastName, int index) async {
-    print("Starting SetactivePlayerFunction");
+    print("Starting th first SetactivePlayerFunction a");
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.setString("activePlayerFirstName", firstName);
     preferences.setString("activePlayerLastName", lastName);
     preferences.setInt("activePlayerIndex", index);
 
     widget.sendInitials();
+    print("Ending the first SetactivePlayerFunction ");
   }
 
   @override
@@ -187,8 +262,9 @@ for (var i = 0; i < listLength; i++) {
     isSidebarOpenedStream = isSidebarOpenedStreamController.stream;
     isSidebarOpenedSink = isSidebarOpenedStreamController.sink;
     print("need context");
-    _getIfUserDetails(widgetContext);
-
+    
+      _getIfUserDetails(widgetContext);
+    
   }
 
   @override
@@ -202,7 +278,7 @@ for (var i = 0; i < listLength; i++) {
   void onIconPressed() {
     final animationStatus = _animationController.status;
     final isAnimationCompleted = animationStatus == AnimationStatus.completed;
-    
+
     if (isAnimationCompleted) {
       isSidebarOpenedSink.add(false);
       _animationController.reverse();
@@ -223,7 +299,7 @@ for (var i = 0; i < listLength; i++) {
       email = "waiting";
     }
     final screenWidth = MediaQuery.of(context).size.width;
-   
+
     if (widget.y) {
       onIconPressed();
     }
@@ -277,24 +353,21 @@ for (var i = 0; i < listLength; i++) {
                         color: Colors.white.withOpacity(0.3),
                         indent: 32,
                         endIndent: 32,
-                      ), 
-                      Padding(padding: EdgeInsets.fromLTRB(25, 10, 0, 10), child: Row(children: [Text("Select Player ", style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800),)],),),
-                      
-                      Column(children: playersWidgets),
-                      Divider(
-                        height: 64,
-                        thickness: 0.5,
-                        color: Colors.white.withOpacity(0.3),
-                        indent: 32,
-                        endIndent: 32,
                       ),
+                     selectedPlayersHeadLine(),
+                      
                       MenuItem(
+                        onTap: () {
+                          onIconPressed();
+                        },
                         icon: Icons.settings,
                         title: "Settings",
                       ),
                       MenuItem(
                         onTap: () {
-                          onIconPressed();
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => LoginScreen()));
+                          
                         },
                         icon: Icons.exit_to_app,
                         title: "Logout",
@@ -308,7 +381,6 @@ for (var i = 0; i < listLength; i++) {
                 child: GestureDetector(
                   onTap: () {
                     onIconPressed();
-                   
                   },
                   child: ClipPath(
                     clipper: CustomMenuClipper(),

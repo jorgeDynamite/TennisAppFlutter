@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 
 
-import 'HomePageStuff/View.dart';
+import '../HomePageStuff/View.dart';
 
 
 
@@ -48,8 +48,7 @@ SizedBox(height: 20),
                       ],) ,
                   textColor: Colors.white,
                 )),],),), right: 3, bottom: 3,),],
-       )),
-      HomePageView([28,33]),]));
+       )),]));
       
   }
 }

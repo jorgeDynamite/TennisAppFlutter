@@ -63,7 +63,7 @@ class _AddExistingState extends State<AddExisting> {
       };
       
       final databaseReference = FirebaseDatabase.instance.reference();
-      var id = databaseReference.child("CP_Accounts/" + value[3] + "/",).push();
+      var id = databaseReference.child("CP_Accounts/" + value[3] + value[4] + "-" + value[5] + "/" + value[1] + value[2] + "-" +value[5],).push();
       id.set(accountdata);
       print("creating Account");
 
@@ -120,7 +120,7 @@ class _AddExistingState extends State<AddExisting> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
-        backgroundColor: primaryBlue,
+        backgroundColor: Colors.black,
         body: Container(
           alignment: Alignment.topCenter,
           margin: EdgeInsets.symmetric(horizontal: 30),
@@ -130,14 +130,14 @@ class _AddExistingState extends State<AddExisting> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  'Sign in to AGP and continue',
+                  'Choose existing player to account',
                   textAlign: TextAlign.center,
                   style:
                       GoogleFonts.openSans(color: Colors.white, fontSize: 28),
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'Enter your email and password below if you have an account. Otherwise click on "Register here"!',
+                  'Fill in all the inlogging details for the account you want to manage throu your account',
                   textAlign: TextAlign.center,
                   style:
                       GoogleFonts.openSans(color: Colors.white, fontSize: 14),
@@ -150,56 +150,28 @@ class _AddExistingState extends State<AddExisting> {
                 SizedBox(height: 20),
                 _buildTextField(passwordController, Icons.lock, 'Password', true),
                 SizedBox(height: 40),
-                MaterialButton(
+                MaterialButton( 
                   shape: RoundedRectangleBorder(
   borderRadius: BorderRadius.circular(12.0)),
                   elevation: 0,
                   minWidth: double.maxFinite,
-                  height: 55,
+                  height: 65,
                   onPressed: () {
                     this.setState(() {
                       path = "Tennis_Accounts";
                     });
                     updateAccount("Tennis_Accounts");
                   },
-                  color: primaryGreen,
-                  child: Text('Login as Tennis Player',
+                  color: Color(0xFF0ADE7C),
+                  child: Text('Add Tennis Player',
                       style: TextStyle(color: Colors.white, fontSize: 17)),
                   textColor: Colors.white,
                 ),
                 SizedBox(height: 10),
-                MaterialButton(
-                  shape: RoundedRectangleBorder(
-  borderRadius: BorderRadius.circular(12.0)),
-                  elevation: 0,
-                  minWidth: double.maxFinite,
-                  height: 55,
-                  onPressed: () {
-                    this.setState(() {
-                      path = "CP_Accounts";
-                    });
-                    updateAccount("CP_Accounts");
-                    
-              
-
-                    },
-                    
-                  color: Colors.blue,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    
-                    children: <Widget>[
-                      
-                      SizedBox(width: 10),
-                      Text('Login as Coach/Parent',
-                          style: TextStyle(color: Colors.white, fontSize: 17)),
-                    ],
-                  ),
-                  textColor: Colors.white,
-                ),
+                
                 SizedBox(height: 15),
                 _build,
-                SizedBox(height: 65),
+                SizedBox(height: 105),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: _buildFooterLogo(),
@@ -212,15 +184,7 @@ class _AddExistingState extends State<AddExisting> {
                 color: Colors.white,
                 fontSize: 11,
                 fontWeight: FontWeight.bold)),
-              TextButton(onPressed: () {
-                Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => WelcomePage()));
-                }, child: Text("Register here", style: GoogleFonts.openSans(
-                color: Colors.blue,
-                decoration: TextDecoration.underline,
-                fontSize: 13,
-                
-                fontWeight: FontWeight.bold)),), ],
+             ],
             ),
           ),
         ));
@@ -253,7 +217,7 @@ class _AddExistingState extends State<AddExisting> {
 
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-          color: secondaryBlue, border: Border.all(color: Colors.blue)),
+          color: Color(0xFF272626), border: Border.all(color: Color(0xFF3E3B3B))),
       child: TextField(
         obscureText: obscure,
         controller: controller,
@@ -272,8 +236,29 @@ class _AddExistingState extends State<AddExisting> {
     );
   }
 
+_buildTextFieldName(
+    TextEditingController controller, IconData icon, String labelText) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    decoration: BoxDecoration(
+        color: Color(0xFF272626), border: Border.all(color: Color(0xFF3E3B3B))),
+    child: TextField(
+      controller: controller,
+      style: TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+          labelText: labelText,
+          labelStyle: TextStyle(color: Colors.white, fontSize: 13),
+          icon: Icon(
+            icon,
+            color: Colors.white,
+          ),
+          // prefix: Icon(icon),
+          border: InputBorder.none),
+    ),
+  );
 // ignore: camel_case_types
-
+    }
   
 
 
@@ -281,6 +266,7 @@ class _AddExistingState extends State<AddExisting> {
 Future<List> getAllAccounts(String path, String name, String passwords) async {
   bool results = false;
   List<int> t = [0,0];
+  String urlUid = "";
   
   bool finalBool = false;
   final databaseReference = FirebaseDatabase.instance.reference();
@@ -294,31 +280,36 @@ Future<List> getAllAccounts(String path, String name, String passwords) async {
    String lastName;
    SharedPreferences preferences = await SharedPreferences.getInstance();
    String controllUserFirstName = preferences.getString("firstName");
+   String controllUserlastName = preferences.getString("lastName");
+   String controllUserUID = preferences.getString("accountRandomUID");
+  print("CoachUserAccount Details");
   
-  if(path == "asdasda") {
+    if(path == "asdasda") {
     
   
     if (dataSnapshot.value != null) {
     dataSnapshot.value.forEach((key, value) {
+      dataSnapshot.value.forEach((key, value) {
       value.forEach((key, value){
       dynamic account = value;
       accounts.add(account);
       });
       
-      
+      });
       print(accounts.length);
       });
     }
   } else {
     if (dataSnapshot.value != null) {
     dataSnapshot.value.forEach((key, value) {
-     
+     value.forEach((key, value) {
       dynamic account = value;
       accounts.add(account);
       
       
       
       print(accounts.length);
+     });
       });
     }
   }
@@ -331,7 +322,7 @@ Future<List> getAllAccounts(String path, String name, String passwords) async {
         print(name);
         if (accounts[i]["email"] == name){
           if(accounts[i]["password"] == password) {
-           
+           urlUid = accounts[i]["urlUid"].toString();
 result = true;
 firstName = accounts[i]["firstName"];
 lastName = accounts[i]["lastName"];
@@ -352,6 +343,6 @@ lastName = accounts[i]["lastName"];
     t[0] = 1;
   }
 print(t);
-  return [t, firstName, lastName, controllUserFirstName, ];
+  return [t, firstName, lastName, controllUserFirstName, controllUserlastName, controllUserUID, urlUid];
   
 }

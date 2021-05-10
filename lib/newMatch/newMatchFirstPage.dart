@@ -1,5 +1,11 @@
+import 'dart:math';
+
+import 'package:TennisApp/HomePageStuff/View.dart';
+import 'package:TennisApp/Players.dart';
 import 'package:TennisApp/newMatch/newMatchSecondPage.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewMatchFirstPage extends StatefulWidget {
   @override
@@ -7,33 +13,82 @@ class NewMatchFirstPage extends StatefulWidget {
 }
 
 class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
-  TextEditingController controller;
+  String lastNameCoach;
+  String firstNameCoach;
+  String uidCoach;
+  int activePlayerIndex;
+  String text;
+  Tournament tournament;
+  int matchId;
+  String imageURL = "Style/Pictures/antenna-white.png";
+
+  void getPreferncesData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    this.lastNameCoach = preferences.getString("lastName");
+
+    this.firstNameCoach = preferences.getString("firstName");
+    this.uidCoach = preferences.getString("accountRandomUID");
+    this.activePlayerIndex = preferences.getInt("activePlayerIndex");
+  }
+
+  final databaseReference = FirebaseDatabase.instance.reference();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Random random;
+    this.matchId = random.nextInt(10000);
+  }
+
+  TextEditingController controller = TextEditingController();
   bool textFieldFilled = false;
 
-
-  changeFilledValue(bool theBool){
-    
+  changeFilledValue(bool theBool) {
     textFieldFilled = theBool;
   }
+
   double errorMessagePadding = 26;
 
   Widget errorMessageArg;
 
-Widget errorMessageState(widget) {
-  if(widget == null){
-
-return Container();
-
-  } else {
-
-return widget;
-
+  Widget errorMessageState(widget) {
+    if (widget == null) {
+      return Container();
+    } else {
+      return widget;
+    }
   }
-}
 
-Widget errorMessage() {
-return Text("Error: Must fill in all information ", style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),);
-}
+  Widget errorMessage() {
+    return Text(
+      "Error: Must fill in all information ",
+      style: TextStyle(
+          color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget castMatch(bool onOFF) {
+    String onOff;
+    String imageURL;
+    if (onOFF) {
+      imageURL = "Style/Pictures/antenna-green.png";
+      onOff = "ON";
+    } else {
+      onOff = "OFF";
+      imageURL = "Style/Pictures/antenna-white.png";
+    }
+
+    return Column(
+      children: [
+        IconButton(
+            icon: Image.asset(imageURL), onPressed: null), // Image.asset("")
+        Text(onOff,
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white))
+      ],
+    );
+  }
+
   double greenLineWidth = 107;
   @override
   Widget build(BuildContext context) {
@@ -132,19 +187,58 @@ return Text("Error: Must fill in all information ", style: TextStyle(color: Colo
               borderRadius: BorderRadius.all(Radius.circular(20)),
               color: Color(0xFF272626),
             ),
-            height: 190,
+            height: 270,
             width: 350,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 50,
-                ),
-                Padding(
-                    padding: EdgeInsets.only(left: 30, right: 30),
-                    child: _buildTextField(
-                        controller, Icons.person, "Opponent Name", false, changeFilledValue)
-                )],
-            ),
+            child: Stack(children: [
+              Column(
+                children: [
+                  SizedBox(
+                    height: 50,
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(
+                        left: 30,
+                        right: 30,
+                      ),
+                      child: _buildTextField(controller, Icons.person,
+                          "Opponent Name", false, changeFilledValue)),
+                  SizedBox(
+                    height: 45,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: 30,
+                      right: 90,
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                            "Enable others to follow your match if they have Match ID",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ))
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                  padding: EdgeInsets.only(
+                    left: 270,
+                    top: 135,
+                  ),
+                  child: castMatch(true)),
+                  Padding(
+                  padding: EdgeInsets.only(
+                    left: 210,
+                    top: 15,
+                  ),
+                  child: Text("Match ID: " + matchId.toString(), style: TextStyle(color: Colors.white70, fontSize: 16
+                  ,  fontWeight: FontWeight.w600, fontFamily: "Helvetica", ))),
+
+            ]),
           ),
           SizedBox(
             height: 15,
@@ -152,18 +246,16 @@ return Text("Error: Must fill in all information ", style: TextStyle(color: Colo
           MaterialButton(
               onPressed: () {
                 setState(() {
-                 if(textFieldFilled) {
- Navigator.push(
+                  if (textFieldFilled) {
+                    text = controller.text;
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => NewMatchSecondPage()));
-                 } else {
-                   errorMessageArg = errorMessage();
-                   errorMessagePadding = 9;
-
-                 }
-                 
-                   
+                            builder: (_) => NewMatchSecondPage(text)));
+                  } else {
+                    errorMessageArg = errorMessage();
+                    errorMessagePadding = 9;
+                  }
                 });
               },
               child: Container(
@@ -192,124 +284,124 @@ return Text("Error: Must fill in all information ", style: TextStyle(color: Colo
                     )
                   ],
                 ),
-              )),SizedBox(height: errorMessagePadding),
-              errorMessageState(errorMessageArg),
-              SizedBox(height: 330),
-              Align(alignment: Alignment.bottomCenter,child: 
-              Row(
-                
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        color: Color(0xFF272626),
-                      ),
-                      height: 54,
-                      width: 338,
+              )),
+          SizedBox(height: errorMessagePadding),
+          errorMessageState(errorMessageArg),
+          SizedBox(height: 250),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: Color(0xFF272626),
                     ),
-                    Padding(
-                      child: Column(children: [
-                        Stack(
-                          children: [
-                            Padding(
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.home_rounded,
-                                  color:  Color(0xFF9B9191),
-                                ),
-                                iconSize: 27,
+                    height: 54,
+                    width: 338,
+                  ),
+                  Padding(
+                    child: Column(children: [
+                      Stack(
+                        children: [
+                          Padding(
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.home_rounded,
+                                color: Color(0xFF9B9191),
                               ),
-                              padding: EdgeInsets.only(
-                                
-                                top: 1,
-                              ),
+                              iconSize: 27,
                             ),
-                            Padding(
-                              child: Text(
-                                "Home",
-                                style: TextStyle(
-                                    color:  Color(0xFF9B9191), fontSize: 9),
+                            padding: EdgeInsets.only(
+                              top: 1,
+                            ),
+                          ),
+                          Padding(
+                            child: Text(
+                              "Home",
+                              style: TextStyle(
+                                  color: Color(0xFF9B9191), fontSize: 9),
+                            ),
+                            padding: EdgeInsets.only(top: 37, left: 11),
+                          )
+                        ],
+                      )
+                    ]),
+                    padding: EdgeInsets.only(left: 40, bottom: 28),
+                  ),
+                  Padding(
+                    child: Column(children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            children: [
+                              Padding(
+                                child: IconButton(
+                                  icon: Image.asset(
+                                    "Style/Pictures/addButtonGreenReal.png",
+                                    height: 22,
+                                  ),
+                                  iconSize: 22,
+                                ),
+                                padding: EdgeInsets.only(
+                                  bottom: 1,
+                                  left: 20,
+                                ),
                               ),
-                              padding: EdgeInsets.only(top: 37, left: 11),
-                            )
-                          ],
-                        )
-                      ]),
-                      padding: EdgeInsets.only(left: 40, bottom: 28),
-                    ),
-                    Padding(
-                      child: Column(children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Stack(
-                              children: [
-                                Padding(
-                                  child: IconButton(
-                                    icon: Image.asset(
-                                      "Style/Pictures/addButtonGreenReal.png",
-                                      height: 22,
-                                    ),
-                                    iconSize: 22,
+                              Padding(
+                                  child: Text(
+                                    "Play new Match",
+                                    style: TextStyle(
+                                        color: Color(0xFF0ADE7C), fontSize: 9),
                                   ),
                                   padding: EdgeInsets.only(
-                                    bottom: 1,
-                                    left: 20,
-                                  ),
-                                ),
-                                Padding(
-                                    child: Text(
-                                      "Play new Match",
-                                      style: TextStyle(
-                                          color: Color(0xFF0ADE7C),
-                                          fontSize: 9),
-                                    ),
-                                    padding: EdgeInsets.only(
-                                      top: 38,
-                                      left: 12,
-                                    ))
-                              ],
-                            ),
-                          ],
-                        )
-                      ]),
-                      padding: EdgeInsets.only(left: 123.5, bottom: 28),
-                    ),
-                    Padding(
-                      child: Column(children: [
-                        Stack(
-                          children: [
-                            Padding(
-                              child: IconButton(
-                                icon: Image.asset("Style/Pictures/shopping-bag.png", height: 22,)
-                                ,
-                               
-                              ),
-                              padding: EdgeInsets.only(
-                                bottom: 1,
+                                    top: 38,
+                                    left: 12,
+                                  ))
+                            ],
+                          ),
+                        ],
+                      )
+                    ]),
+                    padding: EdgeInsets.only(left: 123.5, bottom: 28),
+                  ),
+                  Padding(
+                    child: Column(children: [
+                      Stack(
+                        children: [
+                          Padding(
+                            child: IconButton(
+                              icon: Image.asset(
+                                "Style/Pictures/shopping-bag.png",
+                                height: 22,
                               ),
                             ),
-                            Padding(
-                              child: Text(
-                                "Shop",
-                                style: TextStyle(
-                                    color: Color(0xFF9B9191), fontSize: 9),
-                              ),
-                              padding: EdgeInsets.only(top: 37, left: 13),
-                            )
-                          ],
-                        )
-                      ]),
-                      padding:
-                          EdgeInsets.only(left: 245, bottom: 28, right: 40),
-                    ),
-                  ],
-                ),
-           ])
-           ,),
+                            padding: EdgeInsets.only(
+                              bottom: 1,
+                            ),
+                          ),
+                          Padding(
+                            child: Text(
+                              "Shop",
+                              style: TextStyle(
+                                  color: Color(0xFF9B9191), fontSize: 9),
+                            ),
+                            padding: EdgeInsets.only(top: 37, left: 13),
+                          )
+                        ],
+                      )
+                    ]),
+                    padding: EdgeInsets.only(left: 245, bottom: 28, right: 40),
+                  ),
+                ],
+              ),
+            ]),
+          ),
         ]));
   }
 }
@@ -324,11 +416,11 @@ _buildTextField(TextEditingController controller, IconData icon,
         border: Border.all(color: Colors.transparent)),
     child: TextField(
       onChanged: (text) {
-if(text != "") {
- changedValue(true);
-} else {
-  changedValue(false);
-}
+        if (text != "") {
+          changedValue(true);
+        } else {
+          changedValue(false);
+        }
       },
       obscureText: obscure,
       controller: controller,

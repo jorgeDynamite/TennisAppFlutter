@@ -1,12 +1,17 @@
 import 'package:TennisApp/HomePageStuff/View.dart';
+import 'package:TennisApp/Players.dart';
 import 'package:TennisApp/newMatch/newMatchFirstPage.dart';
 import 'package:flutter/material.dart';
 
 import 'newMatchLastPage.dart';
 
 class NewMatchSecondPage extends StatefulWidget {
+final String opponentName;
+  NewMatchSecondPage(this.opponentName);
   @override
   _NewMatchSecondPageState createState() => _NewMatchSecondPageState();
+
+
 }
 
 class _NewMatchSecondPageState extends State<NewMatchSecondPage> {
@@ -21,6 +26,53 @@ class _NewMatchSecondPageState extends State<NewMatchSecondPage> {
   double paddingMenuBar = 216;
   Widget nextButtonWidgetStateDependent;
 double errorMessagePadding = 0;
+bool ad;
+
+MatchFormat theMatchFormatDataPackage(String matchFormatName) {
+  List<String> matchFormats = ["Standard 3 Sets", "2 sets + ST", "5 sets to 4 games", "1 set", "60 min", "30 min", "60 min 4 games",];
+  MatchFormat returningValmatchFormat;
+
+if(iconPressed == null){
+ad = false;
+} else {
+  ad = true; 
+
+}
+print("Ad value: " + ad.toString());
+
+  if(matchFormatName == matchFormats[0]){
+    returningValmatchFormat = MatchFormat(numberSets: 3, gamesPerSet: 6, tiebreak6all: true);
+    print("0");
+  }
+  if(matchFormatName == matchFormats[1]){
+    returningValmatchFormat = MatchFormat(numberSets: 2, gamesPerSet: 6, tiebreak6all: true, decidingSuperTiebreak: true);
+    print("1");
+  }
+  if(matchFormatName == matchFormats[2]){
+    returningValmatchFormat = MatchFormat(numberSets: 5, gamesPerSet: 4, tiebreak3all: true);
+    print("2");
+  }
+  if(matchFormatName == matchFormats[3]){
+    returningValmatchFormat = MatchFormat(numberSets: 1, gamesPerSet: 6, tiebreak6all: true);
+    print("3");
+  }
+  if(matchFormatName == matchFormats[4]){
+    returningValmatchFormat = MatchFormat(mostGamesWinsFormat: true, timeRestriction: 60,);
+    print("4");
+  }
+  if(matchFormatName == matchFormats[5]){
+    returningValmatchFormat = MatchFormat(mostGamesWinsFormat: true, timeRestriction: 30,);
+    print("5");
+    
+  }
+  if(matchFormatName == matchFormats[6]){
+    returningValmatchFormat = MatchFormat(gamesPerSet: 4, timeRestriction: 60, tiebreak3all: true);
+    print("6");
+    
+  }
+ 
+  return returningValmatchFormat;
+}
 
 Widget errorMessageArg;
 
@@ -55,8 +107,9 @@ return Text("Error: Must fill in all information ", style: TextStyle(color: Colo
               greenLineWidth = greenLineWidth + 107;
             }
             if(matchTypeButtonText != "Match Format"){
+              
 Navigator.push(context,
-                MaterialPageRoute(builder: (_) => NewMatchLastPage()));
+                MaterialPageRoute(builder: (_) => NewMatchLastPage(theMatchFormatDataPackage(matchTypeButtonText), ad, widget.opponentName)));
             } else {
               errorMessagePadding = 17;
               errorMessageArg = errorMessage();
@@ -176,16 +229,15 @@ Navigator.push(context,
               rulesWidget = rules([
                 "60 minuts match",
                 "Person with most games wins",
-                "Standard tiebreaks",
+                
               ]);
               paddingMenuBar = 216;
               matchTypeButtonText = "60 min";
             }
             if (matchTyperIndex == 6) {
               rulesWidget = rules([
-                "1 set",
-                "6 games",
-                "Standard tiebreak",
+                "30 minuts match",
+                "Person with most games win",
               ]);
               paddingMenuBar = 216;
               matchTypeButtonText = "30 min";
@@ -195,7 +247,7 @@ Navigator.push(context,
                 "Player with most sets won wins",
                 "Tie only if both players have equal sets... ",
                 " and equal games in last set",
-                "Standard tiebreaks",
+                "Tiebreaks at 3 all",
               ]);
               paddingMenuBar = 216;
               matchTypeButtonText = "60 min 4 games";
@@ -567,8 +619,8 @@ Navigator.push(context,
                           Padding(
                             child: IconButton(
                               onPressed: (){
-                                Navigator.push(context,
-                MaterialPageRoute(builder: (_) => HomePageView([28,21, 49])));
+                               Navigator.push(context,
+                MaterialPageRoute(builder: (_) => HomePageView([20,20,40], true)));
                               },
                               icon: Icon(
                                 Icons.home_rounded,

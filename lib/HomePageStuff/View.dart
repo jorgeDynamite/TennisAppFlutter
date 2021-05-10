@@ -13,8 +13,9 @@ import 'FirstPageChartWindows/UnforcedErrors.dart';
 import 'FirstPageChartWindows/categories_row.dart';
 
 class HomePageView extends StatefulWidget {
-  HomePageView(this.opponentsAndYourPoints);
+  HomePageView(this.opponentsAndYourPoints, this.ifCoach);
   List<int> opponentsAndYourPoints;
+  bool ifCoach;
   @override
   _HomePageViewState createState() => _HomePageViewState();
 }
@@ -40,6 +41,7 @@ String playerSelected = "";
   }
   
 void getActivePlayerData() async {
+  print("Getting the data at homepage");
 SharedPreferences preferences = await SharedPreferences.getInstance();
 this.setState(() {
  
@@ -542,7 +544,7 @@ _timer = new Timer(const Duration(milliseconds: 15000), () {
             ),
          
         ]),
-         SideBar(y, getActivePlayerData, selectedPlayerShow),
+         SideBar(y, getActivePlayerData, selectedPlayerShow, widget.ifCoach),
         ]));
   }
 }

@@ -40,7 +40,8 @@ class _CPHomePageState extends State<EmailHomePage> {
     } else {
      mainController = false;
     }
-
+     final random = new Random();
+final uid = random.nextInt(10000);
     if (user.user.isEmailVerified) {
 
       Map<String, dynamic> accountdata = {
@@ -49,6 +50,7 @@ class _CPHomePageState extends State<EmailHomePage> {
         "email": email,
         "password": password,
         "mainController": mainController,
+        "urlUid": uid,
       };
       final databaseReference = FirebaseDatabase.instance.reference();
       SharedPreferences sharedPreferences =
@@ -58,11 +60,11 @@ class _CPHomePageState extends State<EmailHomePage> {
       sharedPreferences.setString("password", password);
       sharedPreferences.setString("firstName", firstNameController.text);
       sharedPreferences.setString("lastName", lastNameController.text);
-      final random = new Random();
-      final uid = random.nextInt(10000);
+     
+      
 
       var id = databaseReference.child('CP_Accounts/' + firstNameController.text + lastNameController.text + "-" + uid.toString() + "/", ).push();
-      var _id = databaseReference.child('Tennis_Accounts/',).push();
+      var _id = databaseReference.child('Tennis_Accounts/' + firstNameController.text + lastNameController.text + "-" + uid.toString() + "/",).push();
       Key keys;
       if (Cp) {
       id.set(accountdata);
@@ -73,14 +75,17 @@ class _CPHomePageState extends State<EmailHomePage> {
       } else {
         _id.set(accountdata);
          sharedPreferences.setString("accountKey", _id.key);
+           sharedPreferences.setString("accountRandomUID", uid.toString());
+
       }
 
       if (Cp) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => popUpPLayers()));
+         Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+    popUpPLayers()), (Route<dynamic> route) => false);
+           
       } else {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => HomePageView([20,20,40])));
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+    HomePageView([28,21, 49], false)), (Route<dynamic> route) => false);
       }
     } else {
       this.setState(() {

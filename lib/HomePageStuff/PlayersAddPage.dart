@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:TennisApp/HomePageStuff/PopUpPlayers.dart';
 import 'package:TennisApp/LoginPage.dart';
@@ -291,7 +292,8 @@ addAccount(bool Cp, context, setState) {
     String mainUserUID;
   
     mainUserUID = preferences.getString("accountRandomUID");
-    
+    final random = new Random();
+    final playerNewUid = random.nextInt(10000);
 
     print("Start creating Account");
     try {
@@ -307,9 +309,9 @@ addAccount(bool Cp, context, setState) {
       };
       SharedPreferences preferences = await SharedPreferences.getInstance();
       final databaseReference = FirebaseDatabase.instance.reference();
-      var _id = databaseReference.child('Tennis_Accounts/').push();
+      var _id = databaseReference.child('Tennis_Accounts/' + firstNameController.text + lastNameController.text + "-" + playerNewUid.toString()).push();
       _id.set(accountdata);
-      var id = databaseReference.child("CP_Accounts/" + mainUserName + mainUserlastName + "-" + mainUserUID + "/",).push();
+      var id = databaseReference.child("CP_Accounts/" + mainUserName + mainUserlastName + "-" + mainUserUID + "/" + firstNameController.text + lastNameController.text + "-" + playerNewUid.toString(),).push();
       id.set(accountdata);
       print("creating Account");
       Navigator.push(

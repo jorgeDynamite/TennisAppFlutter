@@ -86,7 +86,7 @@ class _popUpPLayersState extends State<popUpPLayers> {
                       borderRadius: BorderRadius.circular(12.0)),
                   onPressed: () {
                      bool cp = false;
-                    Navigator.push(
+                  Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => AddExisting()));
@@ -112,10 +112,8 @@ class _popUpPLayersState extends State<popUpPLayers> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0)),
                 onPressed: () {
-             Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => HomePageView([20,12,32])));
+             Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+    HomePageView([28,21, 49], true)), (Route<dynamic> route) => false);
            
                 },
                 color: Color(0xFF272626),

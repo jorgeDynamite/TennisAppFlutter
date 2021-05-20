@@ -16,10 +16,12 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
   String lastNameCoach;
   String firstNameCoach;
   String uidCoach;
+  String onOff; 
   int activePlayerIndex;
   String text;
   Tournament tournament;
   int matchId;
+  bool castMatchPressed = false;
   String imageURL = "Style/Pictures/antenna-white.png";
 
   void getPreferncesData() async {
@@ -36,7 +38,7 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Random random;
+    final random = new Random();
     this.matchId = random.nextInt(10000);
   }
 
@@ -66,22 +68,31 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
           color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),
     );
   }
-
+  
   Widget castMatch(bool onOFF) {
-    String onOff;
-    String imageURL;
-    if (onOFF) {
-      imageURL = "Style/Pictures/antenna-green.png";
-      onOff = "ON";
-    } else {
-      onOff = "OFF";
-      imageURL = "Style/Pictures/antenna-white.png";
-    }
+    
+   
+    
 
     return Column(
       children: [
         IconButton(
-            icon: Image.asset(imageURL), onPressed: null), // Image.asset("")
+            icon: Image.asset(imageURL), onPressed: () {
+           
+    this.setState(() {
+      if (castMatchPressed) {
+      imageURL = "Style/Pictures/antenna-green.png";
+      onOff = "ON";
+      
+    } else {
+      onOff = "OFF";
+      imageURL = "Style/Pictures/antenna-white.png";
+     
+    }
+      castMatchPressed = !castMatchPressed;
+    });
+              
+            }), // Image.asset("")
         Text(onOff,
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white))
@@ -229,7 +240,7 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
                     left: 270,
                     top: 135,
                   ),
-                  child: castMatch(true)),
+                  child: castMatch(castMatchPressed),),
                   Padding(
                   padding: EdgeInsets.only(
                     left: 210,

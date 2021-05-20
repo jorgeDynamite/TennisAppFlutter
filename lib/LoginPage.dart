@@ -287,6 +287,7 @@ Future<List<int>> getAllAccounts(
       String coachLastName, String uid) async {
     print("Starting SetactivePlayerFunction Login Page");
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setBool("loggedIn", true);
     preferences.setString("accountRandomUID", uid);
     preferences.setString("email", coachEmail);
     preferences.setString("lastName", coachLastName);

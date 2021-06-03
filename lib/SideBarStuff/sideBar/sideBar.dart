@@ -110,7 +110,7 @@ return Column(children: [Padding(
     String selected = "";
     List<String> namesOfPlayers;
 
-    print(email);
+    print("Email" + email);
 
     final databaseReference = FirebaseDatabase.instance.reference();
     

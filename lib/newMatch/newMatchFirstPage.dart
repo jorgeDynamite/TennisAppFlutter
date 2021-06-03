@@ -16,7 +16,7 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
   String lastNameCoach;
   String firstNameCoach;
   String uidCoach;
-  String onOff; 
+  String onOff = "OFF"; 
   int activePlayerIndex;
   String text;
   Tournament tournament;
@@ -80,11 +80,12 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
             icon: Image.asset(imageURL), onPressed: () {
            
     this.setState(() {
-      if (castMatchPressed) {
+      if (!castMatchPressed) {
       imageURL = "Style/Pictures/antenna-green.png";
       onOff = "ON";
       
     } else {
+      
       onOff = "OFF";
       imageURL = "Style/Pictures/antenna-white.png";
      
@@ -99,6 +100,15 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
       ],
     );
   }
+
+Future createLiveResults() async {
+  DatabaseReference reference = databaseReference.child("LiveResults/" + matchId.toString() + "/").push();
+  Map<String, dynamic> accountdata = {
+        "match": "Players are prepering",
+        
+      };
+  reference.set(accountdata);
+}
 
   double greenLineWidth = 107;
   @override
@@ -259,10 +269,13 @@ class _NewMatchFirstPageState extends State<NewMatchFirstPage> {
                 setState(() {
                   if (textFieldFilled) {
                     text = controller.text;
+                  if(castMatchPressed){
+createLiveResults();
+                  }
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => NewMatchSecondPage(text)));
+                            builder: (_) => NewMatchSecondPage(text, castMatchPressed, matchId.toString())));
                   } else {
                     errorMessageArg = errorMessage();
                     errorMessagePadding = 9;

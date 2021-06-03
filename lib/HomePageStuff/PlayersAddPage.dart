@@ -310,8 +310,11 @@ addAccount(bool Cp, context, setState) {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       final databaseReference = FirebaseDatabase.instance.reference();
       var _id = databaseReference.child('Tennis_Accounts/' + firstNameController.text + lastNameController.text + "-" + playerNewUid.toString()).push();
+      databaseReference.child('Tennis_Accounts/' + firstNameController.text + lastNameController.text + "-" + playerNewUid.toString() + "/" + "playerTournaments" + "/").push().set(null);
       _id.set(accountdata);
       var id = databaseReference.child("CP_Accounts/" + mainUserName + mainUserlastName + "-" + mainUserUID + "/" + firstNameController.text + lastNameController.text + "-" + playerNewUid.toString(),).push();
+            databaseReference.child('CP_Accounts/'+ mainUserName + mainUserlastName + "-" + mainUserUID + "/" + firstNameController.text + lastNameController.text + "-" + playerNewUid.toString() + "/" + "playerTournaments" + "/").push().set(null);
+
       id.set(accountdata);
       print("creating Account");
       Navigator.push(

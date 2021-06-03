@@ -1,15 +1,18 @@
 import 'package:TennisApp/HomePageStuff/View.dart';
 import 'package:TennisApp/Players.dart';
+import 'package:TennisApp/newMatch/matchPanel.dart';
 import 'package:TennisApp/newMatch/newMatchFirstPage.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NewMatchLastPage extends StatefulWidget {
-  NewMatchLastPage(this.matchFormat, this.ad, this.opponentName);
+  NewMatchLastPage(this.matchFormat, this.ad, this.opponentName, this.castLiveResults, this.matchID);
+  final String matchID;
   final MatchFormat matchFormat;
   final bool ad;
   final String opponentName;
+  final bool castLiveResults;
   @override
   _NewMatchLastPageState createState() => _NewMatchLastPageState();
 }
@@ -17,11 +20,14 @@ class NewMatchLastPage extends StatefulWidget {
 class _NewMatchLastPageState extends State<NewMatchLastPage> {
   TextEditingController controller = TextEditingController();
   double greenLineWidth = 214;
+  String url;
   final databaseReference = FirebaseDatabase.instance.reference();
   String coachlastName;
   String coachfirstName;
   String coachemail;
-  String coachuid;    
+  String coachuid;
+  String playerFirstName;
+  String playerLastName;       
   
 
   Widget iconPressed;
@@ -45,6 +51,7 @@ class _NewMatchLastPageState extends State<NewMatchLastPage> {
  List<int> trackedStats= [1,1,1,0,0,0,1,0,0,0,0,0,0,0,0];
   
   List<String> activeTournaments = [];
+  List<Match> activeTournamentsData = [];
   List<bool> firststatButtonsOnPressedBool = [
     true,
     true,
@@ -73,17 +80,38 @@ List<bool> changeablestatButtonsOnPressedBool = [true, false ];
 Future getActiveTournaments() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     this.coachlastName = preferences.getString("lastName");
-    
+    this.playerFirstName = preferences.getString("activePlayerFirstName");
+    this.playerLastName = preferences.getString("activePlayerLastName");
     this.coachfirstName = preferences.getString("firstName");
     this.coachuid = preferences.getString("accountRandomUID");
-    String url = ("CP_Accounts/" + coachfirstName + coachlastName + "-" + coachuid + "/" + "playerTournaments" + "/");
-
+    url = ("CP_Accounts/" + coachfirstName + coachlastName + "-" + coachuid + "/"  );
+    String playersFullNameWithoutSpaces = playerFirstName + playerLastName;
     databaseReference.child(url).push();
     DataSnapshot dataSnapshot = await databaseReference.child(url).once();
 
     if (dataSnapshot.value != null) {
       dataSnapshot.value.forEach((key, value) {
-    activeTournaments.add(key.toString());
+        List<String> split = key.split("/");
+        print(split);
+        List<String> split2 = split[split.length - 1].split("-");
+        if(split2[0] == playersFullNameWithoutSpaces){
+
+
+          // When you know you are on the right player
+          
+          value.forEach((key, value) {
+            if(key == "playerTournamnets"){
+              value.forEach((key, value) {
+activeTournaments.add(key.toString());
+});
+            }
+ 
+          });
+        }
+
+        
+   
+    
         print(key);
       });
     } else {
@@ -129,13 +157,15 @@ surface = "Carpet";
 match = Matches( winners: trackedStats[0], doubleFaults: trackedStats[1], unforcedErrors: trackedStats[2], firstServeProcentage: trackedStats[3], secondServeProcentage: trackedStats[4], forcedErrors: trackedStats[5], aces: trackedStats[6], voleyErrors: trackedStats[7], voleyWinner: trackedStats[8], returnWinner: trackedStats[9], returnErrors: trackedStats[0]
 ,rules: Rules(ad: widget.ad, matchFormatVariable: widget.matchFormat), surface: surface, opponent: widget.opponentName); 
 
-if(tournamentName == null){
+if(!iconPressedBool){
   //Ad match in existing tournament
+
   
 } else {
 newTournament = Tournament(matches: [match], surface: [surface], tournamentName: tournamentName);
 
 }
+
 
 
 }
@@ -612,6 +642,8 @@ if(textFieldChangedBool){
                 if(surfaceTypeButtonText != "Surface") {
                   
                 matchDataPack();
+                Navigator.push(context,
+                MaterialPageRoute(builder: (_) => MatchPanel(newTournament, widget.opponentName, widget.castLiveResults, widget.matchID)));
              
             
                 } else {
@@ -660,6 +692,7 @@ if(textFieldChangedBool){
   Widget nextButton() {
     return MaterialButton(
         onPressed: () {
+
           setState(() {
             if (greenLineWidth != 321) {
               greenLineWidth = greenLineWidth + 107;

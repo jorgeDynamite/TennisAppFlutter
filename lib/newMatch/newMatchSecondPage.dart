@@ -7,7 +7,9 @@ import 'newMatchLastPage.dart';
 
 class NewMatchSecondPage extends StatefulWidget {
 final String opponentName;
-  NewMatchSecondPage(this.opponentName);
+final bool castLiveResults;
+final String matchID;
+  NewMatchSecondPage(this.opponentName, this.castLiveResults, this.matchID);
   @override
   _NewMatchSecondPageState createState() => _NewMatchSecondPageState();
 
@@ -109,7 +111,7 @@ return Text("Error: Must fill in all information ", style: TextStyle(color: Colo
             if(matchTypeButtonText != "Match Format"){
               
 Navigator.push(context,
-                MaterialPageRoute(builder: (_) => NewMatchLastPage(theMatchFormatDataPackage(matchTypeButtonText), ad, widget.opponentName)));
+                MaterialPageRoute(builder: (_) => NewMatchLastPage(theMatchFormatDataPackage(matchTypeButtonText), ad, widget.opponentName, widget.castLiveResults, widget.matchID)));
             } else {
               errorMessagePadding = 17;
               errorMessageArg = errorMessage();

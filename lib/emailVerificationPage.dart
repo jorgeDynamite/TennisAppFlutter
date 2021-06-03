@@ -68,11 +68,13 @@ final uid = random.nextInt(10000);
       Key keys;
       if (Cp) {
       id.set(accountdata);
+      
       sharedPreferences.setString("accountKey", id.key);
       sharedPreferences.setString("accountRandomUID", uid.toString());
 
       print(id.key);
       } else {
+        databaseReference.child('Tennis_Accounts/' + firstNameController.text + lastNameController.text + "-" + uid.toString() + "/" + "playerTournaments" + "/").push().set(null);
         _id.set(accountdata);
          sharedPreferences.setString("accountKey", _id.key);
            sharedPreferences.setString("accountRandomUID", uid.toString());

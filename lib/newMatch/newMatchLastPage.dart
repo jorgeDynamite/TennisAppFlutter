@@ -48,7 +48,7 @@ class _NewMatchLastPageState extends State<NewMatchLastPage> {
   Tournament newTournament;
   String surface; 
   Matches match;
- List<int> trackedStats= [1,1,1,0,0,0,1,0,0,0,0,0,0,0,0];
+ List<int> trackedStats= [1,1,1,0,0,0,1,0,0,0,0,];
   
   List<String> activeTournaments = [];
   List<Match> activeTournamentsData = [];
@@ -349,8 +349,15 @@ trackedStats[2] = 1;
 if(stat == "First Serves"){
 if(trackedStats[3] == 0){
 trackedStats[3] = 1;
+
 } else {
   trackedStats[3] = 0;
+}
+if(trackedStats[4] == 0){
+trackedStats[4] = 1;
+
+} else {
+  trackedStats[4] = 0;
 }
 
 }
@@ -360,7 +367,12 @@ trackedStats[4] = 1;
 } else {
   trackedStats[4] = 0;
 }
+if(trackedStats[3] == 0){
+trackedStats[3] = 1;
 
+} else {
+  trackedStats[3] = 0;
+}
 }
 if(stat == "Forced Errors"){
 if(trackedStats[5] == 0){
@@ -478,6 +490,20 @@ if(borderColor == null ) {
                
                 
               }
+              if (stat == "First Serves") {
+                 this.setState(() {
+                   firststatButtonsOnPressedBool[4] =
+                    firststatButtonsOnPressedBool[buttonIndex];
+                
+                
+                     });}
+                     if (stat == "Second Serves") {
+                 this.setState(() {
+                   firststatButtonsOnPressedBool[3] =
+                    firststatButtonsOnPressedBool[4];
+                
+                
+                     });}
            noteTheStatsTrackedFunc(stat);
           },
           child: Padding(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:TennisApp/newMatch/thePoint/Serve.dart';
 import 'package:flutter/material.dart';
 
 import 'package:TennisApp/HomePageStuff/View.dart';
@@ -70,6 +71,107 @@ List<int> thirdsetStandings = [0,0];
 List<int> fourthsetStandings = [0,0];
 List<int> fifthsetStandings = [0,0];
 
+//Wisch stat varibles schould you track
+bool firstServe; 
+bool secondServe; 
+bool doubleFault;
+bool winners;
+bool voleyError;
+bool voleyWinner;   
+bool ace; 
+bool unforcedErrors; 
+bool forcedErrors; 
+bool returnError; 
+bool returnWinner; 
+
+
+
+void witchStatsSchouldTrack(){
+  print("witchStats");
+Matches url = widget.tournamentDataPack.matches[0];
+if(url.firstServeProcentage == 1){
+firstServe = true; 
+url.firstServeProcentage = 0;
+} else {
+  firstServe = false; 
+}
+if(url.secondServeProcentage == 1){
+  url.secondServeProcentage = 0;
+secondServe = true; 
+} else {
+  secondServe = false; 
+}
+if(url.doubleFaults == 1){
+  url.doubleFaults = 0;
+doubleFault = true; 
+} else {
+  doubleFault = false; 
+}
+if(url.winners == 1){
+  url.winners = 0;
+winners = true; 
+} else {
+  winners = false; 
+}
+
+if(url.unforcedErrors == 1){
+  url.unforcedErrors = 0;
+unforcedErrors = true; 
+} else {
+  unforcedErrors = false; 
+}
+
+if(url.voleyErrors == 1){
+  url.voleyErrors = 0;
+voleyError = true; 
+} else {
+  voleyError = false; 
+}
+
+if(url.voleyWinner == 1){
+  url.voleyWinner = 0;
+voleyWinner = true; 
+} else {
+  voleyWinner = false; 
+}
+
+if(url.returnErrors == 1){
+  url.returnErrors = 0;
+returnError = true; 
+} else {
+  returnError = false; 
+}
+
+if(url.returnWinner == 1){
+  url.returnWinner = 0;
+returnWinner = true; 
+} else {
+  returnWinner = false; 
+}
+
+if(url.unforcedErrors == 1){
+  url.unforcedErrors = 0;
+unforcedErrors = true; 
+} else {
+  unforcedErrors = false; 
+}
+
+if(url.forcedErrors == 1){
+  url.forcedErrors = 0;
+forcedErrors = true; 
+} else {
+  forcedErrors = false; 
+}
+
+if(url.aces == 1){
+  url.aces = 0;
+ace = true; 
+} else {
+  ace = false; 
+}
+
+
+}
 
 
 //End 
@@ -104,7 +206,7 @@ Future timeTracker() async {
   void initState(){
     // TODO: implement initState
     super.initState();
-  
+   witchStatsSchouldTrack();
    
   }
 
@@ -593,7 +695,14 @@ Padding(
                     child: MaterialButton(
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
-                      onPressed: () {},
+                      onPressed: () {
+ Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => Serve(whoServes, doubleFault, firstServe,secondServe,winners,voleyWinner,returnWinner, returnError,voleyError,unforcedErrors,forcedErrors, widget.tournamentDataPack )));
+                
+
+                      },
                       child: Container(
                         height: 175,
                         decoration: BoxDecoration(
